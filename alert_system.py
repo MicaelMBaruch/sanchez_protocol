@@ -8,7 +8,7 @@ import time
 class AlertSystem:
     def __init__(self, silent_mode=False):
         pygame.init()
-        # pygame.mixer.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.font_large = pygame.font.SysFont(None, 120)
         self.font_medium = pygame.font.SysFont(None, 80)
@@ -19,7 +19,7 @@ class AlertSystem:
         # Comando para Arch/Hyprland (Wireplumber/Pipewire)
         try:
             subprocess.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "0"])
-            subprocess.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "1.0"])
+            subprocess.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "0.1"])
         except Exception:
             pass # Fallback silencioso
 
@@ -53,13 +53,13 @@ class AlertSystem:
         if self.silent_mode or time.time() < self.alarm_muted_until:
             return
             
-        # Implementação simulada, adicione os arquivos .wav na pasta assets
-        # if sound_type == "warning" and not pygame.mixer.music.get_busy():
-        #     pygame.mixer.music.load("assets/warning.wav")
-        #     pygame.mixer.music.play()
-        # elif sound_type == "alarm":
-        #     self.override_system_volume()
-        #     ...
+        if sound_type == "warning" and not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load("assets/warning.mp3")
+            pygame.mixer.music.play()
+        elif sound_type == "alarm":
+            self.override_system_volume()
+            pygame.mixer.music.load("assets/alarm.mp3")
+            pygame.mixer.music.play()
 
     def mute_temporarily(self, seconds=15):
         self.alarm_muted_until = time.time() + seconds

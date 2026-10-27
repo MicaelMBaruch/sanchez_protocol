@@ -5,5 +5,5 @@ face_recognition_models==0.3.0
 numpy==2.5.4
 opencv-python==5.0.0.93
 pillow==13.0.0
-pygame==2.6.1
+pygame-ce==2.5.8
 setuptools==80.10.2
