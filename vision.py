@@ -2,32 +2,36 @@ import cv2
 import face_recognition
 import numpy as np
 import os
+import pickle
 
 class VisionModule:
-    def __init__(self, known_faces_dir="rostos_permitidos"):
+    def __init__(self, cache_file="encodings.pkl"):
         self.cap = cv2.VideoCapture(0)
         self.known_encodings = []
         self.known_names = []
-        self._load_known_faces(known_faces_dir)
         
-        # Constantes para estimativa de distância (Foco da câmera e largura média do rosto em cm)
-        self.FOCAL_LENGTH = 600  # Precisa calibrar para sua webcam
+        # Carrega o cache serializado em milissegundos
+        self._load_encodings_from_cache(cache_file)
+        
+        self.FOCAL_LENGTH = 600
         self.KNOWN_FACE_WIDTH = 14.0 
-
-        self.frame_skip_rate = 5
+        
+        self.frame_skip_rate = 3
         self.frame_count = 0
         self.last_faces_data = []
 
-    def _load_known_faces(self, directory):
-        if not os.path.exists(directory):
+    def _load_encodings_from_cache(self, cache_file):
+        """Lê o arquivo .pkl contendo as matrizes da rede neural pré-computadas."""
+        if not os.path.exists(cache_file):
+            print(f"[ERRO CRÍTICO] Cache '{cache_file}' não encontrado.")
+            print("Execute 'python build_encodings.py' antes de iniciar o protocolo.")
             return
-        for filename in os.listdir(directory):
-            if filename.endswith((".jpg", ".png")):
-                img = face_recognition.load_image_file(os.path.join(directory, filename))
-                encodings = face_recognition.face_encodings(img)
-                if encodings:
-                    self.known_encodings.append(encodings[0])
-                    self.known_names.append(os.path.splitext(filename)[0])
+
+        with open(cache_file, "rb") as f:
+            data = pickle.load(f)
+            self.known_encodings = data["encodings"]
+            self.known_names = data["names"]
+            print(f"[VISION] {len(self.known_names)} rostos pré-carregados do cache em tempo recorde.")
 
     def check_camera_covered(self, frame):
         # Se a imagem estiver muito escura ou com variância muito baixa, está coberta
@@ -57,7 +61,7 @@ class VisionModule:
 
             self.last_faces_data = []
             for (top, right, bottom, left), encoding in zip(face_locations, face_encodings):
-                matches = face_recognition.compare_faces(self.known_encodings, encoding, tolerance=0.5)
+                matches = face_recognition.compare_faces(self.known_encodings, encoding, tolerance=0.6)
                 name = "Desconhecido"
                 if True in matches:
                     name = self.known_names[matches.index(True)]
