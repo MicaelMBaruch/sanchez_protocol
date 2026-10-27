@@ -1,3 +1,8 @@
 rostos_permitidos/*
 
 __pycache__
+
+# Imagens
+*.jpg
+*.png
+
