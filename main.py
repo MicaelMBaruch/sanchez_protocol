@@ -108,6 +108,7 @@ def main():
             elif state != ALARM: # Uma vez no alarme, só sai com senha
                 state = IDLE
                 alert.render_ui(frame)
+                alert.play_sound("stop")
 
     # Limpeza
     vision.cap.release()

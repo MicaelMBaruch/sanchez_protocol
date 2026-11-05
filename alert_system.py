@@ -54,12 +54,18 @@ class AlertSystem:
             return
             
         if sound_type == "warning" and not pygame.mixer.music.get_busy():
-            pygame.mixer.music.load("assets/warning.mp3")
+            warning_sound = os.path.expanduser("~/repos/sanchez_protocol/assets/warning.mp3")
+            pygame.mixer.music.load(warning_sound)
             pygame.mixer.music.play()
+
         elif sound_type == "alarm":
             self.override_system_volume()
-            pygame.mixer.music.load("assets/alarm.mp3")
+            alarm_sound = os.path.expanduser("~/repos/sanchez_protocol/assets/alarm.mp3")
+            pygame.mixer.music.load(alarm_sound)
             pygame.mixer.music.play()
+
+        elif sound_type == "stop":
+            pygame.mixer.music.stop()
 
     def mute_temporarily(self, seconds=15):
         self.alarm_muted_until = time.time() + seconds
