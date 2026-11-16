@@ -5,7 +5,8 @@ import os
 import pickle
 
 class VisionModule:
-    def __init__(self, cache_file="encodings.pkl"):
+    cache_file = os.path.expanduser("~/repos/sanchez_protocol/encodings.pkl")
+    def __init__(self, cache_file=cache_file):
         self.cap = cv2.VideoCapture(0)
         self.known_encodings = []
         self.known_names = []
